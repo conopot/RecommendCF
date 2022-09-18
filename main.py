@@ -7,7 +7,7 @@ import requests
 from ast import literal_eval
 from sklearn.metrics.pairwise import cosine_similarity
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
@@ -24,7 +24,7 @@ def hello_world():
     name = os.environ.get("NAME", "World")
     return "Hello {}!".format(name)
 
-@app.route("/recommendCF")
+@app.route("/recommendCF", methods=['POST'])
 def recommend():
     # Get data from CloudFront
 
@@ -61,6 +61,12 @@ def recommend():
     item_based_collabor = pd.DataFrame(data = item_based_collabor, index = music_user_rating.index, columns = music_user_rating.index)
 
     # Inference
+
+    # Get users data from request
+    params = request.get_json()
+    arr =params['musicArr']
+    print(arr)
+
     title = 54825
     recommends = item_based_collabor[title].sort_values(ascending=False)[:6]
 
