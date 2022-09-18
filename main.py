@@ -11,12 +11,17 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
+# Get File From CloudFront
 def getFileFromCloudFront(cloudFrontUrl, filePath):
   file = requests.get(cloudFrontUrl + filePath, allow_redirects=True)
   url_content = file.content
   csv_file = open(filePath,'wb')
   csv_file.write(url_content)
   csv_file.close()
+
+# For Sorting
+def f1(x):
+	return x[1]
 
 # test code
 @app.route("/")
@@ -26,7 +31,7 @@ def hello_world():
 
 @app.route("/recommendCF", methods=['POST'])
 def recommend():
-    # Get data from CloudFront
+    # 1) Get data from CloudFront
 
     # Get CloudFront url from env
     cloudFrontUrl = os.environ.get("CLOUD_FRONT_URL")
@@ -40,6 +45,8 @@ def recommend():
     musicsPath = "musics.csv"
     getFileFromCloudFront(cloudFrontUrl, musicsPath)
     music_data = pd.read_csv(musicsPath)
+
+    # 2) Make CF Model
 
     # Drop timestamp data
     rating_data.drop('timestamp', axis = 1, inplace=True)
@@ -60,19 +67,41 @@ def recommend():
     # Get dataframe
     item_based_collabor = pd.DataFrame(data = item_based_collabor, index = music_user_rating.index, columns = music_user_rating.index)
 
-    # Inference
+    # 3) Inference
 
     # Get users data from request
     params = request.get_json()
     arr =params['musicArr']
     print(arr)
 
-    title = 54825
-    recommends = item_based_collabor[title].sort_values(ascending=False)[:6]
+    rec = dict() # recommended idx
+    ret = []
 
-    print(recommends)
+    for title in arr:
+        try:
+            recommends = item_based_collabor[title].sort_values(ascending=False)[:6]
+            idxs = recommends.index
+            for idx in idxs:
+                if(idx == title or recommends[idx] == 1): # pass input and unnecessary data
+                    continue
+                if(idx in rec): # already recommend
+                    rec[idx] += 1
+                else:           # new recommend
+                    rec[idx] = 1
+            
+            # sorting by value
+            sortedArr = sorted(rec.items(),key=f1)
 
-    return jsonify(recommends.to_json)
+            for item in sortedArr:
+                ret.append(item[0])
+                if(ret.length == 20):
+                    break                
+
+            print(ret)
+        except:
+            print("There has no title : {}".format(title))
+
+    return jsonify(ret)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
