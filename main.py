@@ -78,12 +78,16 @@ def recommend():
     ret = []
 
     for title in arr:
+        title = int(title)
         try:
             recommends = item_based_collabor[title].sort_values(ascending=False)[:6]
             idxs = recommends.index
+            print(idxs)
             for idx in idxs:
                 if(idx == title or recommends[idx] == 1): # pass input and unnecessary data
                     continue
+                if(str(idx) in arr): # pass all input
+                    continue 
                 if(idx in rec): # already recommend
                     rec[idx] += 1
                 else:           # new recommend
@@ -94,12 +98,12 @@ def recommend():
 
             for item in sortedArr:
                 ret.append(item[0])
-                if(ret.length == 20):
+                if(len(ret) == 20):
                     break                
+        except Exception as e:
+            print(e)
 
-            print(ret)
-        except:
-            print("There has no title : {}".format(title))
+    print(ret)
 
     return jsonify(ret)
 
