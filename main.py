@@ -82,7 +82,6 @@ def recommend():
         try:
             recommends = item_based_collabor[title].sort_values(ascending=False)[:6]
             idxs = recommends.index
-            print(idxs)
             for idx in idxs:
                 if(idx == title or recommends[idx] == 1): # pass input and unnecessary data
                     continue
@@ -91,17 +90,17 @@ def recommend():
                 if(idx in rec): # already recommend
                     rec[idx] += 1
                 else:           # new recommend
-                    rec[idx] = 1
-            
-            # sorting by value
-            sortedArr = sorted(rec.items(),key=f1)
-
-            for item in sortedArr:
-                ret.append(item[0])
-                if(len(ret) == 20):
-                    break                
+                    rec[idx] = 1          
         except Exception as e:
             print(e)
+
+    # sorting by value
+    sortedArr = sorted(rec.items(),key=f1)
+
+    for item in sortedArr:
+        ret.append(item[0])
+        if(len(ret) == 20):
+            break      
 
     print(ret)
 
