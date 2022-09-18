@@ -75,12 +75,12 @@ def recommend():
     print(arr)
 
     rec = dict() # recommended idx
-    ret = []
+    ret = [] # return array
 
     for title in arr:
         title = int(title)
         try:
-            recommends = item_based_collabor[title].sort_values(ascending=False)[:6]
+            recommends = item_based_collabor[title].sort_values(ascending=False)[:4]
             idxs = recommends.index
             for idx in idxs:
                 if(idx == title or recommends[idx] == 1): # pass input and unnecessary data
