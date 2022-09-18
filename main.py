@@ -7,7 +7,7 @@ import requests
 from ast import literal_eval
 from sklearn.metrics.pairwise import cosine_similarity
 
-from flask import Flask
+from flask import Flask, jsonify
 
 app = Flask(__name__)
 
@@ -66,7 +66,7 @@ def recommend():
 
     print(recommends)
 
-    return recommends.to_json
+    return jsonify(recommends.to_json)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
