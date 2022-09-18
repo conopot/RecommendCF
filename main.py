@@ -71,8 +71,13 @@ def recommend():
 
     # Get users data from request
     params = request.get_json()
-    arr =params['musicArr']
-    print(arr)
+
+    # Parsing Json (String)
+    arr = params['musicArr'].split('"')
+
+    for str in arr:
+        if(str == '[' or str == ']' or str == ', '):
+            arr.remove(str)
 
     rec = dict() # recommended idx
     ret = [] # return array
