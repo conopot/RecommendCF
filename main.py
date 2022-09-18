@@ -41,11 +41,32 @@ def recommend():
     getFileFromCloudFront(cloudFrontUrl, musicsPath)
     music_data = pd.read_csv(musicsPath)
 
-    # Test code
-    print(rating_data.head(2))
-    print(music_data.head(2))
+    # Drop timestamp data
+    rating_data.drop('timestamp', axis = 1, inplace=True)
 
-    return "Rating data size {}".format(str(rating_data.size))
+    # Merge user data and music data
+    user_music_rating = pd.merge(rating_data, music_data, on = 'musicId')
+
+    # Make pivot table
+    music_user_rating = user_music_rating.pivot_table('rating', index = 'title', columns='userId')
+    user_music_rating = user_music_rating.pivot_table('rating', index = 'userId', columns='title')
+
+    # Fill NA to 0
+    music_user_rating.fillna(0, inplace = True)
+
+    # Get cosine similarity
+    item_based_collabor = cosine_similarity(music_user_rating)
+
+    # Get dataframe
+    item_based_collabor = pd.DataFrame(data = item_based_collabor, index = music_user_rating.index, columns = music_user_rating.index)
+
+    # Inference
+    title = 54825
+    recommends = item_based_collabor[title].sort_values(ascending=False)[:6]
+
+    print(recommends)
+
+    return recommends.to_json
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
