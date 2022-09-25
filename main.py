@@ -74,9 +74,10 @@ def recommend():
 
     # Parsing Json (String)
     arr = params['musicArr'].split('"')
+    arr = arr.replace('[', '').replace(']','').replace(' ', '')
 
     for sTocken in arr:
-        if(sTocken == '[' or sTocken == ']' or sTocken == ', '):
+        if(sTocken == ''):
             arr.remove(sTocken)
 
     rec = dict() # recommended idx
