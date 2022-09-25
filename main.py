@@ -73,8 +73,8 @@ def recommend():
     params = request.get_json()
 
     # Parsing Json (String)
-    arr = params['musicArr'].split('"')
-    arr = arr.replace('[', '').replace(']','').replace(' ', '')
+    arr = params['musicArr'].replace('[', '').replace(']','').replace(' ', '')
+    arr = arr.split(',')
 
     for sTocken in arr:
         if(sTocken == ''):
