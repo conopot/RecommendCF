@@ -86,17 +86,20 @@ def recommend():
     for title in arr:
         title = int(title)
         try:
-            recommends = item_based_collabor[title].sort_values(ascending=False)[:4]
+            recommends = item_based_collabor[title].sort_values(ascending=False)[:11]
             idxs = recommends.index
+            cnt = 0
             for idx in idxs:
-                if(idx == title or recommends[idx] == 1): # pass input and unnecessary data
+                if(idx == title or recommends[idx] == 1 or recommends[idx] == 0): # pass self and unnecessary data
                     continue
                 if(str(idx) in arr): # pass all input
                     continue 
                 if(idx in rec): # already recommend
                     rec[idx] += 1
                 else:           # new recommend
-                    rec[idx] = 1          
+                    rec[idx] = 1 
+                    cnt += 1
+                    if(cnt > 3): break   
         except Exception as e:
             print(e)
 
